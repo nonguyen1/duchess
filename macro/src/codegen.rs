@@ -812,11 +812,13 @@ impl ClassInfo {
                     jvm: &mut duchess::Jvm<'jvm>,
                 ) -> duchess::LocalResult<'jvm, Self::Output<'jvm>> {
                     let this = self.#this.into_java(jvm)?;
+                    println!("This is some code that I am trying to run like right now");
                     let this: & #this_ty = duchess::prelude::AsJRef::as_jref(&this)?;
+                    println!("Check AA");
                     let this = duchess::plumbing::JavaObjectExt::as_raw(this);
-
+                    println!("Check BB");
                     #(#prepare_inputs)*
-
+                    println!("Check CC");
                     // Cache the method id for this method -- note that we only have one cache
                     // no matter how many generic monomorphizations there are. This makes sense
                     // given Java's erased-based generics system.
@@ -825,7 +827,7 @@ impl ClassInfo {
                         let class = <#this_ty as duchess::JavaObject>::class(jvm)?;
                         duchess::plumbing::find_method(jvm, &class, #jni_method, #jni_descriptor, false)
                     })?;
-
+                    println!("Check EE");
                     unsafe {
                         jvm.env().invoke(|env| env.#jni_call_fn, |env, f| f(
                             env,
@@ -1231,8 +1233,17 @@ impl ClassInfo {
                     let #input_name = self.#input_name.do_jni(jvm)?;
                 ),
                 NonRepeatingType::Ref(_) => quote_spanned!(self.span =>
+                    println!("Check BB.A");
                     let #input_name = self.#input_name.into_java(jvm)?;
-                    let #input_name = duchess::prelude::AsJRef::as_jref(&#input_name)?;
+                    println!("Check BB.B");
+                    let #input_name = duchess::prelude::AsJRef::as_jref(&#input_name);
+                    println!("Check BB.C");
+                    match #input_name {
+                        Ok(_) => println!("Check BB.D - OK"),
+                        Err(_) => println!("Check BB.E - NOT OK"),
+                    }
+                    let #input_name = #input_name?;
+                    println!("Check BB.Z");
                 ),
             })
             .collect()

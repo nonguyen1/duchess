@@ -18,7 +18,9 @@ where
     U: JavaObject,
 {
     fn as_jref(&self) -> Nullable<&U> {
+        println!("In the generic as_jref");
         let this = self.try_jderef()?;
+        println!("Didn't make it past the try");
         Ok(unsafe { std::mem::transmute(this) })
     }
 }
@@ -108,8 +110,14 @@ where
 
     fn try_jderef(&self) -> Result<&T::Java, NullJRef> {
         match self {
-            Some(r) => r.try_jderef(),
-            None => Err(NullJRef),
+            Some(r) => {
+                println!("TRY DEREF SOME");
+                r.try_jderef()
+            },
+            None => {
+                println!("TRY DEREF NONE");
+                Err(NullJRef)
+            }
         }
     }
 }

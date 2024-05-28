@@ -49,12 +49,14 @@ fn try_extract_message(exception: &impl AsJRef<Throwable>) -> String {
         || -> crate::Result<_> { exception.as_jref()?.to_string().assert_not_null().execute() };
     result().unwrap_or_else(|err| format!("failed to get message: {}", err))
 }
+use std::backtrace::Backtrace;
 
 impl<T> Debug for Error<T>
 where
     T: AsJRef<Throwable>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        println!("Custom backtrace: {}", Backtrace::force_capture());
         Display::fmt(self, f)
     }
 }

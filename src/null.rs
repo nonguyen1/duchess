@@ -1,10 +1,12 @@
-use crate::{AsJRef, JavaObject, NullJRef};
+use crate::{AsJRef, JavaObject};
 
 #[derive(Copy, Clone)]
 pub struct Null;
 
 impl<J: JavaObject> AsJRef<J> for Null {
     fn as_jref(&self) -> crate::Nullable<&J> {
-        Err(NullJRef)
+        let null_ptr: *const () = std::ptr::null();
+        let null_ref: &J = unsafe { std::mem::transmute(null_ptr) };
+        Ok(null_ref)
     }
 }
